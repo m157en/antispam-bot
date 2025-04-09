@@ -15,7 +15,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 def main() -> None:
     """Запуск бота."""
     # Вставьте ваш токен
-    application = Application.builder().token("YOUR_BOT_TOKEN").build()
+    application = Application.builder().token("TELEGRAM_TOKEN").build()
 
     # Добавляем обработчик команды /start
     start_handler = CommandHandler("start", start)
