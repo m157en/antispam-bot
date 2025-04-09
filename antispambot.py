@@ -3,7 +3,6 @@ import logging
 from telegram import Update
 from telegram.ext import Application, CommandHandler
 from telegram.ext import CallbackContext
-from flask import Flask
 
 # Установим логирование
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -33,8 +32,8 @@ def main():
     # Получаем порт из переменной окружения или ставим дефолтный
     port = int(os.getenv("PORT", 8080))
     
-    # Запускаем бота с поллингом и задаем порт для сервера
-    application.run_polling(allowed_updates=Update.ALL_TYPES, listen="0.0.0.0", port=port)
+    # Запускаем бота с поллингом (без listen, Render будет сам управлять этим)
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == "__main__":
     main()
