@@ -1,25 +1,15 @@
-from flask import Flask
-import threading
-from telegram.ext import Application, MessageHandler, filters
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
-TOKEN = '7873382190:AAH48KXaEfURUMGlsvwn_K1FTxIgxIntRSI'
+TOKEN = "7995709418:AAFtDXaswnyzDWP_XRsEd9BSgzcqSoWcx9I"  # замените на свой
 
-app = Flask(__name__)
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Бот запущен! 🛡️")
 
-def start_bot():
-    application = Application.builder().token(TOKEN).build()
-
-    async def handle_message(update, context):
-        await update.message.reply_text("Привет! Я антиспам-бот!")
-
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-
-    application.run_polling()
-
-@app.route('/')
-def home():
-    return "Бот работает!"
+def main():
+    app = ApplicationBuilder().token(TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    app.run_polling()
 
 if __name__ == '__main__':
-    threading.Thread(target=start_bot).start()
-    app.run(host='0.0.0.0', port=8080)
+    main()
