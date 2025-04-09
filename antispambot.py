@@ -45,7 +45,7 @@ async def handle_message(update: Update, context: CallbackContext) -> None:
 async def error(update: Update, context: CallbackContext) -> None:
     logger.warning(f'Ошибка {context.error}')
 
-async def main():
+def main():
     # Введите ваш токен, который вы получили от BotFather
     token = '7995709418:AAFtDXaswnyzDWP_XRsEd9BSgzcqSoWcx9I'
 
@@ -62,8 +62,7 @@ async def main():
     application.add_error_handler(error)
 
     # Запускаем бота
-    await application.run_polling()
+    application.run_polling()  # Используем напрямую без asyncio.run()
 
 if __name__ == '__main__':
-    import asyncio
-    asyncio.run(main())
+    main()
