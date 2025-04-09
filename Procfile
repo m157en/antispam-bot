@@ -1,1 +1,1 @@
-web: python3 antispambot.py
+web: gunicorn antispambot:app
