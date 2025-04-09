@@ -2,6 +2,9 @@ import logging
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
 import time
+from flask import Flask
+
+app = Flask(__name__)
 
 # Включаем логирование для отслеживания ошибок
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -15,7 +18,7 @@ user_messages = {}
 COOLDOWN_TIME = 2  # например, 2 секунды
 SPAM_THRESHOLD = 5  # максимальное количество сообщений за данный интервал времени
 
-# Функция, которая вызывается при старте бота
+# Функция для старта бота
 async def start(update: Update, context: CallbackContext) -> None:
     await update.message.reply_text('Привет! Я анти-спам бот. Я блокирую спам-сообщения.')
 
@@ -35,34 +38,34 @@ async def handle_message(update: Update, context: CallbackContext) -> None:
 
     # Если количество сообщений за заданный интервал превышает порог, это спам
     if len(user_messages[user_id]) > SPAM_THRESHOLD:
+        # Уведомляем, что пользователь заблокирован
         await update.message.reply_text('Вы отправляете слишком много сообщений. Блокировка на 30 секунд.')
         await context.bot.kick_chat_member(update.message.chat_id, user_id)
     else:
         # Если не спам, просто отвечаем сообщением
         await update.message.reply_text('Ваше сообщение получено.')
 
-# Функция для обработки ошибок
-async def error(update: Update, context: CallbackContext) -> None:
-    logger.warning(f'Ошибка {context.error}')
+# Запуск бота
+def run_telegram_bot():
+    token = 'YOUR_BOT_TOKEN'
 
-def main():
-    # Введите ваш токен, который вы получили от BotFather
-    token = '7995709418:AAFtDXaswnyzDWP_XRsEd9BSgzcqSoWcx9I'
-
-    # Создание объекта Application
     application = Application.builder().token(token).build()
 
-    # Регистрируем обработчик команд /start
     application.add_handler(CommandHandler("start", start))
-
-    # Регистрируем обработчик сообщений
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
-    # Регистрируем обработчик ошибок
-    application.add_error_handler(error)
+    application.run_polling()
 
-    # Запускаем бота
-    application.run_polling()  # Используем напрямую без asyncio.run()
+# Flask сервер для Render
+@app.route('/')
+def index():
+    return 'Анти-спам бот работает!'
 
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    import threading
+    # Запуск Telegram бота в отдельном потоке
+    telegram_thread = threading.Thread(target=run_telegram_bot)
+    telegram_thread.start()
+    
+    # Запуск Flask сервера на порту, который указан в окружении Render
+    app.run(host="0.0.0.0", port=int(os.getenv("PORT", 8080)))
