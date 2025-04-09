@@ -1,7 +1,9 @@
-import logging
+import asyncio
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
+import logging
 import time
+import os
 
 # Включаем логирование для отслеживания ошибок
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -42,19 +44,21 @@ async def handle_message(update: Update, context: CallbackContext) -> None:
         await update.message.reply_text('Ваше сообщение получено.')
 
 # Функция для обработки ошибок
-async def error(update: Update, context: CallbackContext) -> None:
+def error(update: Update, context: CallbackContext) -> None:
     logger.warning(f'Ошибка {context.error}')
 
-# Основная функция для запуска бота
-async def main() -> None:
+# Основная асинхронная функция
+async def main():
     # Введите ваш токен, который вы получили от BotFather
-    token = '7995709418:AAEof7qpf2XCFLEV4I_J5_9pD0j7qHqdqlw'  # Замените на ваш токен
+    token = os.getenv("TELEGRAM_TOKEN")  # Используем переменную окружения для токена
 
     # Создание объекта Application
     application = Application.builder().token(token).build()
 
-    # Регистрируем обработчики
+    # Регистрируем обработчик команд /start
     application.add_handler(CommandHandler("start", start))
+
+    # Регистрируем обработчик сообщений
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     # Регистрируем обработчик ошибок
@@ -63,6 +67,10 @@ async def main() -> None:
     # Запускаем бота
     await application.run_polling()
 
-if __name__ == '__main__':
-    import asyncio
-    asyncio.run(main())
+if __name__ == "__main__":
+    # Получаем цикл событий
+    loop = asyncio.get_event_loop()
+
+    # Запускаем основную асинхронную задачу
+    loop.create_task(main())
+    loop.run_forever()
