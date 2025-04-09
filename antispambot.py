@@ -1,6 +1,6 @@
 import logging
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+from telegram.ext import Updater, CommandHandler, MessageHandler, filters, CallbackContext
 import time
 
 # Включаем логирование для отслеживания ошибок
@@ -27,7 +27,7 @@ def handle_message(update: Update, context: CallbackContext) -> None:
     if user_id not in user_messages:
         user_messages[user_id] = []
 
-    # Очищаем старые сообщения, которые старше 10 секунд
+    # Очищаем старые сообщения, которые старше COOLDOWN_TIME секунд
     user_messages[user_id] = [msg_time for msg_time in user_messages[user_id] if current_time - msg_time < COOLDOWN_TIME]
 
     # Добавляем текущее сообщение
@@ -59,7 +59,7 @@ def main():
     dispatcher.add_handler(CommandHandler("start", start))
 
     # Регистрируем обработчик сообщений
-    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
+    dispatcher.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     # Регистрируем обработчик ошибок
     dispatcher.add_error_handler(error)
