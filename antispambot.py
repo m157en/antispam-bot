@@ -53,7 +53,7 @@ def error(update: Update, context: CallbackContext) -> None:
 
 # Функция для запуска телеграм-бота
 def run_telegram_bot():
-    token = '7995709418:AAFtDXaswnyzDWP_XRsEd9BSgzcqSoWcx9I'
+    token = '7995709418:7995709418:AAEof7qpf2XCFLEV4I_J5_9pD0j7qHqdqlw'
 
     # Создание объекта Updater
     updater = Updater(token)
